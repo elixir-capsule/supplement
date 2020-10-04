@@ -3,11 +3,12 @@ defmodule Supplement.MixProject do
 
   def project do
     [
-      app: :supplement,
+      app: :capsule_supplement,
       version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -18,11 +19,15 @@ defmodule Supplement.MixProject do
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:capsule, "~> 0.5"},
+      {:ex_aws, "~> 2.0", optional: true},
+      {:ex_aws_s3, "~> 2.0", optional: true}
     ]
   end
 end
