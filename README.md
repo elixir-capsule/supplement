@@ -58,6 +58,7 @@ This storage uploads files to [AWS's S3](https://aws.amazon.com/s3/) service. It
 Supplement implements the `Capsule.Upload` protocol for the following modules:
 
 * [URI](#URI)
+* [Plug.Upload](#plugupload)
 
 ### URI
 
@@ -85,3 +86,19 @@ None
 #### notes
 
 This implementation imposes a hard timeout limit of 15 seconds to download the file from the remote location.
+
+### Plug.Upload
+
+This supports multi-part form submissions handled by [Plug](https://hexdocs.pm/plug/Plug.Upload.html#content).
+
+#### configuration
+
+None
+
+#### options
+
+None
+
+#### notes
+
+None
