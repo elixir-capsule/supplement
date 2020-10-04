@@ -1,6 +1,6 @@
 # Capsule Supplement
 
-Starter pack for using [Capsule](github.com/elixir-capsule/capsule) with common upload sources and storage solutions.
+Starter pack for using [Capsule](https://github.com/elixir-capsule/capsule) with common upload sources and storage solutions.
 
 Supplement's only *required* dependency is Capsule itself. However, some of the implementations might require further dependencies. In order to use them, consult the `dependencies` section for what to add to your project.
 
