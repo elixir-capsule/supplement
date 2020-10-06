@@ -27,7 +27,8 @@ defmodule Supplement.MixProject do
     [
       {:capsule, "~> 0.5"},
       {:ex_aws, "~> 2.0", optional: true},
-      {:ex_aws_s3, "~> 2.0", optional: true}
+      {:ex_aws_s3, "~> 2.0", optional: true},
+      {:mox, "~> 1.0", only: [:test]}
     ]
   end
 end
