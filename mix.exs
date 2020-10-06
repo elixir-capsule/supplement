@@ -15,7 +15,7 @@ defmodule Supplement.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :ex_aws, :ex_aws_s3]
     ]
   end
 
@@ -27,7 +27,14 @@ defmodule Supplement.MixProject do
     [
       {:capsule, "~> 0.5"},
       {:ex_aws, "~> 2.0", optional: true},
-      {:ex_aws_s3, "~> 2.0", optional: true}
+      {:ex_aws_s3, "~> 2.0", optional: true},
+      {:mox, "~> 1.0", only: [:test]},
+      {:dialyxir, "~> 1.0",
+       [
+         only: :dev,
+         runtime: false,
+         plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+       ]}
     ]
   end
 end
