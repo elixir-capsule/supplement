@@ -25,7 +25,7 @@ defmodule Supplement.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:capsule, "~> 0.5"},
+      {:capsule, "~> 0.6"},
       {:ex_aws, "~> 2.0", optional: true},
       {:ex_aws_s3, "~> 2.0", optional: true},
       {:mox, "~> 1.0", only: [:test]},
