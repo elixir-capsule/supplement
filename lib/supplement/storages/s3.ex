@@ -49,7 +49,7 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def open(%Encapsulation{id: id}, opts \\ []) do
+  def read(%Encapsulation{id: id}, opts \\ []) do
     case Client.get_object(config(opts, :bucket), id) |> ex_aws_module().request() do
       {:ok, %{body: contents}} -> {:ok, contents}
       error -> handle_error(error)
