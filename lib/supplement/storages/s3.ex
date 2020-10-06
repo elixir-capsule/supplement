@@ -8,9 +8,11 @@ defmodule Capsule.Storages.S3 do
   @impl Storage
   def put(upload, opts \\ []) do
     key = Path.join(opts[:prefix] || "/", Upload.name(upload))
+
     {:ok, contents} = Upload.contents(upload)
 
-    case Client.put_object(config(:bucket), key, contents) |> config(:ex_aws_module).request() do
+    case Client.put_object(config(opts, :bucket), key, contents)
+         |> config(:ex_aws_module).request() do
       {:ok, _} ->
         encapsulation = %Encapsulation{
           id: key,
@@ -26,8 +28,8 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def copy(%Encapsulation{id: id} = encapsulation, path) do
-    case Client.put_object_copy(config(:bucket), path, config(:bucket), id)
+  def copy(%Encapsulation{id: id} = encapsulation, path, opts \\ []) do
+    case Client.put_object_copy(config(opts, :bucket), path, config(opts, :bucket), id)
          |> config(:ex_aws_module).request() do
       {:ok, _} ->
         {:ok, %{encapsulation | id: path}}
@@ -38,8 +40,8 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def delete(%Encapsulation{id: id}) do
-    case Client.delete_object(config(:bucket), id)
+  def delete(%Encapsulation{id: id}, opts \\ []) do
+    case Client.delete_object(config(opts, :bucket), id)
          |> config(:ex_aws_module).request() do
       {:ok, _} -> {:ok, nil}
       error -> handle_error(error)
@@ -47,14 +49,18 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def open(%Encapsulation{id: id}) do
-    case Client.get_object(config(:bucket), id) |> config(:ex_aws_module).request() do
+  def open(%Encapsulation{id: id}, opts \\ []) do
+    case Client.get_object(config(opts, :bucket), id) |> config(:ex_aws_module).request() do
       {:ok, %{body: contents}} -> {:ok, contents}
       error -> handle_error(error)
     end
   end
 
-  defp config(key), do: Application.fetch_env!(:capsule, __MODULE__) |> Keyword.fetch!(key)
+  defp config(opts \\ [], key) do
+    Application.fetch_env!(:capsule, __MODULE__)
+    |> Keyword.merge(opts)
+    |> Keyword.fetch!(key)
+  end
 
   defp handle_error({:error, error}) do
     {:error, "S3 storage API error: #{error |> inspect()}"}

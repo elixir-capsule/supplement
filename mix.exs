@@ -8,7 +8,8 @@ defmodule Supplement.MixProject do
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      elixirc_paths: elixirc_paths(Mix.env()),
+      dialyzer: dialyzer()
     ]
   end
 
@@ -25,16 +26,18 @@ defmodule Supplement.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:capsule, "~> 0.5"},
+      {:capsule, "~> 0.6"},
       {:ex_aws, "~> 2.0", optional: true},
       {:ex_aws_s3, "~> 2.0", optional: true},
       {:mox, "~> 1.0", only: [:test]},
-      {:dialyxir, "~> 1.0",
-       [
-         only: :dev,
-         runtime: false,
-         plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
-       ]}
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false}
+    ]
+  end
+
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts",
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
     ]
   end
 end
