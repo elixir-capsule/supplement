@@ -4,12 +4,16 @@ defmodule Supplement.MixProject do
   def project do
     [
       app: :capsule_supplement,
-      version: "0.1.0",
+      description: "Supplemental storages and uploads for use with Capsule",
+      version: "0.8.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
-      dialyzer: dialyzer()
+      dialyzer: dialyzer(),
+      name: "CapsuleSupplement",
+      source_url: "https://github.com/elixir-capsule/supplement",
+      package: package()
     ]
   end
 
@@ -30,7 +34,8 @@ defmodule Supplement.MixProject do
       {:ex_aws, "~> 2.0", optional: true},
       {:ex_aws_s3, "~> 2.0", optional: true},
       {:mox, "~> 1.0", only: [:test]},
-      {:dialyxir, "~> 1.0", only: :dev, runtime: false}
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
@@ -38,6 +43,14 @@ defmodule Supplement.MixProject do
     [
       plt_core_path: "priv/plts",
       plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Thomas Floyd Wright"],
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => "https://github.com/elixir-capsule/supplement"}
     ]
   end
 end
