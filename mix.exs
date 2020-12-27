@@ -5,7 +5,7 @@ defmodule Supplement.MixProject do
     [
       app: :capsule_supplement,
       description: "Supplemental storages and uploads for use with Capsule",
-      version: "0.8.0",
+      version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
