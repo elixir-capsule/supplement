@@ -34,19 +34,19 @@ defmodule Capsule.Storages.S3Test do
     end
   end
 
-  describe "open/1" do
+  describe "read/1" do
     test "returns success tuple with data" do
       stub(ExAwsMock, :request, fn _ -> {:ok, %{body: "data"}} end)
 
-      assert {:ok, "data"} = S3.open(%Encapsulation{})
+      assert {:ok, "data"} = S3.read(%Encapsulation{})
     end
   end
 
-  describe "open/2 with bucket override" do
+  describe "read/2 with bucket override" do
     test "makes request with override value" do
       stub(ExAwsMock, :request, fn %{bucket: "other"} -> {:ok, %{body: ""}} end)
 
-      assert {:ok, _} = S3.open(%Encapsulation{}, bucket: "other")
+      assert {:ok, _} = S3.read(%Encapsulation{}, bucket: "other")
     end
   end
 

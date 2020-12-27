@@ -52,7 +52,7 @@ defmodule Capsule.Storages.Disk do
   end
 
   @impl Storage
-  def open(%Encapsulation{id: id}, opts \\ []), do: path_in_root(opts, id) |> File.read()
+  def read(%Encapsulation{id: id}, opts \\ []), do: path_in_root(opts, id) |> File.read()
 
   defp config(opts, key) do
     Application.fetch_env!(:capsule, __MODULE__)
