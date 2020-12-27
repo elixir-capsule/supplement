@@ -16,6 +16,7 @@ The Supplement ships with the following storage implementations:
 
 * [Disk](#Disk)
 * [S3](#S3)
+* [RAM](#RAM)
 
 ### Disk
 
@@ -52,6 +53,10 @@ This storage uploads files to [AWS's S3](https://aws.amazon.com/s3/) service. It
 {:ex_aws, "~> 2.0"}
 {:ex_aws_s3, "~> 2.0"}
 ```
+
+### RAM
+
+Uses Elixir's [StringIO](https://hexdocs.pm/elixir/StringIO.html) module to store file contents in memory. Since the "files" are essentially just strings, they will not be persisted and will error if they are read back from a database, for example. However, operations are correspondingly very fast and thus suitable for tests or other temporary file operations.
 
 ## uploads
 
