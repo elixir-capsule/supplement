@@ -4,12 +4,6 @@ Starter pack for using [Capsule](https://github.com/elixir-capsule/capsule) with
 
 Supplement's only *required* dependency is Capsule itself. However, some of the implementations might require further dependencies. In order to use them, consult the `dependencies` section for what to add to your project.
 
-Supplement is not currently published on Hex, so use the `git` or `github` options for `mix` to add it to your project:
-
-`{:capsule_supplement, github: "elixir-capsule/supplement", branch: "main"}`
-
-Or, if you prefer to maintain your own implementations, just copy the specific module files you'd like to use directly into your own project source.
-
 ## Storages
 
 The Supplement ships with the following storage implementations:
