@@ -15,7 +15,11 @@ defmodule Capsule.Storages.Disk do
 
       File.write!(destination, contents)
 
-      encapsulation = %Encapsulation{id: path, size: byte_size(contents), storage: __MODULE__}
+      encapsulation = %Encapsulation{
+        id: path,
+        size: byte_size(contents),
+        storage: to_string(__MODULE__)
+      }
 
       {:ok, encapsulation}
     end

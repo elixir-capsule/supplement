@@ -17,7 +17,7 @@ defmodule Capsule.Storages.S3 do
         encapsulation = %Encapsulation{
           id: key,
           size: byte_size(contents),
-          storage: __MODULE__
+          storage: to_string(__MODULE__)
         }
 
         {:ok, encapsulation}
