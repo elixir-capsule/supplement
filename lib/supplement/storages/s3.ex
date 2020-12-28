@@ -43,7 +43,7 @@ defmodule Capsule.Storages.S3 do
   def delete(%Encapsulation{id: id}, opts \\ []) do
     case Client.delete_object(config(opts, :bucket), id)
          |> ex_aws_module().request() do
-      {:ok, _} -> {:ok, nil}
+      {:ok, _} -> :ok
       error -> handle_error(error)
     end
   end

@@ -50,7 +50,7 @@ defmodule Capsule.Storages.Disk do
     path_in_root(opts, id)
     |> File.rm()
     |> case do
-      :ok -> {:ok, nil}
+      :ok -> :ok
       {:error, error} -> {:error, "Could not remove file: #{error}"}
     end
   end
