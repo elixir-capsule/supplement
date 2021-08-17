@@ -40,6 +40,22 @@ defmodule Capsule.Storages.S3Test do
     end
   end
 
+  describe "put/2 with valid s3 option" do
+    test "adds corresponding AWS header to request" do
+      stub(ExAwsMock, :request, fn %{headers: %{"x-amz-acl" => "public-read"}} -> {:ok, nil} end)
+
+      assert {:ok, _} = S3.put(%MockUpload{}, s3_options: [acl: "public-read"])
+    end
+  end
+
+  describe "put/2 with invalid s3 option" do
+    test "is noop" do
+      stub(ExAwsMock, :request, fn %{headers: %{}} -> {:ok, nil} end)
+
+      assert {:ok, _} = S3.put(%MockUpload{}, s3_options: [bad: "option"])
+    end
+  end
+
   describe "read/1" do
     test "returns success tuple with data" do
       stub(ExAwsMock, :request, fn _ -> {:ok, %{body: "data"}} end)

@@ -2,15 +2,15 @@
 
 Starter pack for using [Capsule](https://github.com/elixir-capsule/capsule) with common upload sources and storage solutions.
 
-Supplement's only *required* dependency is Capsule itself. However, some of the implementations might require further dependencies. In order to use them, consult the `dependencies` section for what to add to your project.
+Supplement's only _required_ dependency is Capsule itself. However, some of the implementations might require further dependencies. In order to use them, consult the `dependencies` section for what to add to your project.
 
 ## Storages
 
 The Supplement ships with the following storage implementations:
 
-* [Disk](#Disk)
-* [S3](#S3)
-* [RAM](#RAM)
+- [Disk](#Disk)
+- [S3](#S3)
+- [RAM](#RAM)
 
 ### Disk
 
@@ -18,16 +18,16 @@ This saves uploaded files to a local disk. It is useful for caching uploads whil
 
 #### configuration
 
-* To set the root directory where files will be stored: `Application.put_env(:capsule, Capsule.Storages.Disk, root_dir: "tmp")`
+- To set the root directory where files will be stored: `Application.put_env(:capsule, Capsule.Storages.Disk, root_dir: "tmp")`
 
 #### options
 
-* `prefix`: This should be a valid system path that will be appended to the root. If it does not exist, Disk will create it.
-* `force`: If this option is set to a truthy value, Disk will overwrite any existing file at the derived path. Use with caution!
+- `prefix`: This should be a valid system path that will be appended to the root. If it does not exist, Disk will create it.
+- `force`: If this option is set to a truthy value, Disk will overwrite any existing file at the derived path. Use with caution!
 
 #### notes
 
-Since it is possible for files with the same name to be uploaded multiple times, Disk needs some additional info to uniquely identify the file. Disk *does not* overwrite files with the same name by default. To ensure an upload can be stored, the combination of the `Upload.name` and `prefix` should be unique.
+Since it is possible for files with the same name to be uploaded multiple times, Disk needs some additional info to uniquely identify the file. Disk _does not_ overwrite files with the same name by default. To ensure an upload can be stored, the combination of the `Upload.name` and `prefix` should be unique.
 
 ### S3
 
@@ -35,11 +35,12 @@ This storage uploads files to [AWS's S3](https://aws.amazon.com/s3/) service. It
 
 #### configuration
 
-* To set the bucket where files will be stored: `Application.put_env(:capsule, Capsule.Storages.S3, bucket: "whatever")`
+- To set the bucket where files will be stored: `Application.put_env(:capsule, Capsule.Storages.S3, bucket: "whatever")`
 
 #### options
 
-* prefix: A string to prepend to the upload's key
+- prefix: A string to prepend to the upload's key
+- s3_options: Keyword list of option that will passed directly to ex_aws_s3
 
 #### dependencies
 
@@ -56,8 +57,8 @@ Uses Elixir's [StringIO](https://hexdocs.pm/elixir/StringIO.html) module to stor
 
 Supplement implements the `Capsule.Upload` protocol for the following modules:
 
-* [URI](#URI)
-* [Plug.Upload](#plugupload)
+- [URI](#URI)
+- [Plug.Upload](#plugupload)
 
 ### URI
 

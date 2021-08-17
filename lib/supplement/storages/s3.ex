@@ -11,7 +11,12 @@ defmodule Capsule.Storages.S3 do
 
     {:ok, contents} = Upload.contents(upload)
 
-    case Client.put_object(config(opts, :bucket), key, contents)
+    case Client.put_object(
+           config(opts, :bucket),
+           key,
+           contents,
+           Keyword.get(opts, :s3_options, [])
+         )
          |> ex_aws_module().request() do
       {:ok, _} ->
         encapsulation = %Encapsulation{
