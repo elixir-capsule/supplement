@@ -9,7 +9,7 @@ defimpl Capsule.Upload, for: URI do
 
     case download |> Task.await(15_000) do
       {:ok, {{'HTTP/1.1', 200, 'OK'}, _headers, body}} -> {:ok, body}
-      {:error, {reason}} -> {:error, reason}
+      {:error, {reason, _}} -> {:error, reason}
     end
   end
 
