@@ -7,36 +7,28 @@ defmodule Capsule.Storages.S3Test do
   alias Capsule.{Encapsulation, MockUpload, ExAwsMock}
 
   describe "put/1" do
-    test "returns success tuple" do
+    test "prefixes id with bucket" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
-      assert {:ok, %Encapsulation{id: "/hi"}} = S3.put(%MockUpload{})
+      assert {:ok, %Encapsulation{id: "fake/hi"}} = S3.put(%MockUpload{}, bucket: "fake")
     end
 
     test "sets size" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
-      assert {:ok, %Encapsulation{size: 14}} = S3.put(%MockUpload{})
+      assert {:ok, %Encapsulation{size: 14}} = S3.put(%MockUpload{}, bucket: "fake")
     end
 
     test "sets storage" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
-      assert {:ok, %Encapsulation{storage: "Elixir.Capsule.Storages.S3"}} = S3.put(%MockUpload{})
+      assert {:ok, %Encapsulation{storage: "Elixir.Capsule.Storages.S3"}} = S3.put(%MockUpload{}, bucket: "fake")
     end
 
     test "returns error when request fails" do
       stub(ExAwsMock, :request, fn _ -> {:error, nil} end)
 
-      assert {:error, _} = S3.put(%MockUpload{})
-    end
-  end
-
-  describe "put/2 with bucket override" do
-    test "makes request with override value" do
-      stub(ExAwsMock, :request, fn %{bucket: "other"} -> {:ok, nil} end)
-
-      assert {:ok, _} = S3.put(%MockUpload{}, bucket: "other")
+      assert {:error, _} = S3.put(%MockUpload{}, bucket: "fake")
     end
   end
 
@@ -44,7 +36,7 @@ defmodule Capsule.Storages.S3Test do
     test "adds corresponding AWS header to request" do
       stub(ExAwsMock, :request, fn %{headers: %{"x-amz-acl" => "public-read"}} -> {:ok, nil} end)
 
-      assert {:ok, _} = S3.put(%MockUpload{}, s3_options: [acl: "public-read"])
+      assert {:ok, _} = S3.put(%MockUpload{}, bucket: "fake", s3_options: [acl: "public-read"])
     end
   end
 
@@ -52,7 +44,7 @@ defmodule Capsule.Storages.S3Test do
     test "is noop" do
       stub(ExAwsMock, :request, fn %{headers: %{}} -> {:ok, nil} end)
 
-      assert {:ok, _} = S3.put(%MockUpload{}, s3_options: [bad: "option"])
+      assert {:ok, _} = S3.put(%MockUpload{}, bucket: "fake", s3_options: [bad: "option"])
     end
   end
 
@@ -60,15 +52,7 @@ defmodule Capsule.Storages.S3Test do
     test "returns success tuple with data" do
       stub(ExAwsMock, :request, fn _ -> {:ok, %{body: "data"}} end)
 
-      assert {:ok, "data"} = S3.read(%Encapsulation{})
-    end
-  end
-
-  describe "read/2 with bucket override" do
-    test "makes request with override value" do
-      stub(ExAwsMock, :request, fn %{bucket: "other"} -> {:ok, %{body: ""}} end)
-
-      assert {:ok, _} = S3.read(%Encapsulation{}, bucket: "other")
+      assert {:ok, "data"} = S3.read(%Encapsulation{id: "fake/hi"})
     end
   end
 
@@ -77,15 +61,7 @@ defmodule Capsule.Storages.S3Test do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
       assert {:ok, %Encapsulation{id: "new_path"}} =
-               S3.copy(%Encapsulation{id: "/path"}, "new_path")
-    end
-  end
-
-  describe "copy/2 with bucket override" do
-    test "makes request with override value" do
-      stub(ExAwsMock, :request, fn %{bucket: "other"} -> {:ok, nil} end)
-
-      assert {:ok, _} = S3.copy(%Encapsulation{}, "new_path", bucket: "other")
+               S3.copy(%Encapsulation{id: "/path"}, "new_path", bucket: "fake")
     end
   end
 end

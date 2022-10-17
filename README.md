@@ -16,13 +16,9 @@ The Supplement ships with the following storage implementations:
 
 This saves uploaded files to a local disk. It is useful for caching uploads while you validate other data, and/or perform some file processing.
 
-#### configuration
-
-- To set the root directory where files will be stored: `Application.put_env(:capsule, Capsule.Storages.Disk, root_dir: "tmp")`
-
 #### options
 
-- `prefix`: This should be a valid system path that will be appended to the root. If it does not exist, Disk will create it.
+- `prefix`: This should be a valid system path relative to the current working directory. If it does not exist, it will be created.
 - `force`: If this option is set to a truthy value, Disk will overwrite any existing file at the derived path. Use with caution!
 
 #### notes
@@ -33,14 +29,10 @@ Since it is possible for files with the same name to be uploaded multiple times,
 
 This storage uploads files to [AWS's S3](https://aws.amazon.com/s3/) service. It also works with [Digital Ocean Spaces](https://www.digitalocean.com/products/spaces/).
 
-#### configuration
-
-- To set the bucket where files will be stored: `Application.put_env(:capsule, Capsule.Storages.S3, bucket: "whatever")`
-
 #### options
 
-- prefix: A string to prepend to the upload's key
-- s3_options: Keyword list of option that will passed directly to ex_aws_s3
+- `prefix`: A string to prepend to the upload name when building the id
+- `s3_options`: Keyword list of options that will passed directly to ex_aws_s3
 
 #### dependencies
 
@@ -75,10 +67,6 @@ def attach(conn, %{"attachment" => %{"url" => url}}) when url != "" do
 end
 ```
 
-#### configuration
-
-None
-
 #### options
 
 None
@@ -90,10 +78,6 @@ This implementation imposes a hard timeout limit of 15 seconds to download the f
 ### Plug.Upload
 
 This supports multi-part form submissions handled by [Plug](https://hexdocs.pm/plug/Plug.Upload.html#content).
-
-#### configuration
-
-None
 
 #### options
 

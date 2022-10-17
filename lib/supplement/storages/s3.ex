@@ -7,12 +7,14 @@ defmodule Capsule.Storages.S3 do
 
   @impl Storage
   def put(upload, opts \\ []) do
+    bucket = Keyword.fetch!(opts, :bucket)
+
     key = Path.join(opts[:prefix] || "/", Upload.name(upload))
 
     {:ok, contents} = Upload.contents(upload)
 
     case Client.put_object(
-           config(opts, :bucket),
+           bucket,
            key,
            contents,
            Keyword.get(opts, :s3_options, [])
@@ -20,7 +22,7 @@ defmodule Capsule.Storages.S3 do
          |> ex_aws_module().request() do
       {:ok, _} ->
         encapsulation = %Encapsulation{
-          id: key,
+          id: Path.join(bucket, key),
           size: byte_size(contents),
           storage: to_string(__MODULE__)
         }
@@ -33,8 +35,9 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def copy(%Encapsulation{id: id} = encapsulation, path, opts \\ []) do
-    case Client.put_object_copy(config(opts, :bucket), path, config(opts, :bucket), id)
+  def copy(%Encapsulation{id: id} = encapsulation, path, _opts \\ []) do
+    {bucket, key} = parse_id(id)
+    case Client.put_object_copy(bucket, path, bucket, key)
          |> ex_aws_module().request() do
       {:ok, _} ->
         {:ok, %{encapsulation | id: path}}
@@ -45,8 +48,9 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def delete(%Encapsulation{id: id}, opts \\ []) do
-    case Client.delete_object(config(opts, :bucket), id)
+  def delete(%Encapsulation{id: id}, _opts \\ []) do
+    {bucket, key} = parse_id(id)
+    case Client.delete_object(bucket, key)
          |> ex_aws_module().request() do
       {:ok, _} -> :ok
       error -> handle_error(error)
@@ -54,17 +58,12 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def read(%Encapsulation{id: id}, opts \\ []) do
-    case Client.get_object(config(opts, :bucket), id) |> ex_aws_module().request() do
+  def read(%Encapsulation{id: id}, _opts \\ []) do
+    {bucket, key} = parse_id(id)
+    case Client.get_object(bucket, key) |> ex_aws_module().request() do
       {:ok, %{body: contents}} -> {:ok, contents}
       error -> handle_error(error)
     end
-  end
-
-  defp config(opts, key) do
-    Application.fetch_env!(:capsule, __MODULE__)
-    |> Keyword.merge(opts)
-    |> Keyword.fetch!(key)
   end
 
   defp ex_aws_module() do
@@ -74,5 +73,10 @@ defmodule Capsule.Storages.S3 do
 
   defp handle_error({:error, error}) do
     {:error, "S3 storage API error: #{error |> inspect()}"}
+  end
+
+  defp parse_id(id) do
+    [bucket | rest] = Path.split(id)
+    {bucket, Path.join(rest)}
   end
 end

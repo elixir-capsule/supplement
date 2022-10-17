@@ -5,8 +5,7 @@ defmodule Capsule.Storages.Disk do
 
   @impl Storage
   def put(upload, opts \\ []) do
-    with path <- Path.join(opts[:prefix] || "/", Upload.name(upload)),
-         destination <- path_in_root(opts, path),
+    with destination <- Path.join(opts[:prefix] || ".", Upload.name(upload)),
          true <-
            !File.exists?(destination) || opts[:force] ||
              {:error, "File already exists at upload destination"},
@@ -16,7 +15,7 @@ defmodule Capsule.Storages.Disk do
       File.write!(destination, contents)
 
       encapsulation = %Encapsulation{
-        id: path,
+        id: destination,
         size: byte_size(contents),
         storage: to_string(__MODULE__)
       }
@@ -34,11 +33,8 @@ defmodule Capsule.Storages.Disk do
 
   @impl Storage
   def copy(%Encapsulation{id: id} = encapsulation, path, opts \\ []) do
-    path_in_root(opts, path)
-    |> create_path!
-
-    path_in_root(opts, id)
-    |> File.cp(path_in_root(opts, path))
+    id
+    |> File.cp(path)
     |> case do
       :ok -> {:ok, encapsulation |> Map.replace!(:id, path)}
       error_tuple -> error_tuple
@@ -47,7 +43,7 @@ defmodule Capsule.Storages.Disk do
 
   @impl Storage
   def delete(%Encapsulation{id: id}, opts \\ []) when is_binary(id) do
-    path_in_root(opts, id)
+    id
     |> File.rm()
     |> case do
       :ok -> :ok
@@ -56,18 +52,7 @@ defmodule Capsule.Storages.Disk do
   end
 
   @impl Storage
-  def read(%Encapsulation{id: id}, opts \\ []), do: path_in_root(opts, id) |> File.read()
-
-  defp config(opts, key) do
-    Application.fetch_env!(:capsule, __MODULE__)
-    |> Keyword.merge(opts)
-    |> Keyword.fetch!(key)
-  end
-
-  defp path_in_root(opts, path) do
-    config(opts, :root_dir)
-    |> Path.join(path)
-  end
+  def read(%Encapsulation{id: id}, opts \\ []), do: File.read(id)
 
   defp create_path!(path) do
     path |> Path.dirname() |> File.mkdir_p!()
