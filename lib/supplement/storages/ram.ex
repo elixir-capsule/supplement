@@ -16,7 +16,6 @@ defmodule Capsule.Storages.RAM do
 
     encapsulation = %Encapsulation{
       id: Path.join(serialized_pid, Upload.name(upload)),
-      size: byte_size(contents),
       storage: to_string(__MODULE__)
     }
 

@@ -17,7 +17,6 @@ defmodule Capsule.Storages.Disk do
 
       encapsulation = %Encapsulation{
         id: path,
-        size: byte_size(contents),
         storage: to_string(__MODULE__)
       }
 
