@@ -3,15 +3,15 @@ defmodule Capsule.Storages.RAMTest do
   doctest Capsule
 
   alias Capsule.Storages.RAM
-  alias Capsule.{Encapsulation, MockUpload}
+  alias Capsule.MockUpload
 
   describe "put/1" do
     test "returns success tuple" do
-      assert {:ok, %Encapsulation{}} = RAM.put(%MockUpload{})
+      assert {:ok, _} = RAM.put(%MockUpload{})
     end
 
     test "prefixes id with pid serialization" do
-      {:ok, %Encapsulation{id: id}} = RAM.put(%MockUpload{})
+      {:ok, id} = RAM.put(%MockUpload{})
 
       [serialized_pid, _] = String.split(id, "/")
 
@@ -21,7 +21,7 @@ defmodule Capsule.Storages.RAMTest do
     end
 
     test "suffixes id with name" do
-      {:ok, %Encapsulation{id: id}} = RAM.put(%MockUpload{})
+      {:ok, id} = RAM.put(%MockUpload{})
 
       [_, name] = String.split(id, "/")
 
@@ -31,32 +31,32 @@ defmodule Capsule.Storages.RAMTest do
 
   describe "copy/1" do
     test "returns success tuple" do
-      assert {:ok, _} = RAM.copy(%Encapsulation{id: "fakepid/path"}, "/new_path/name")
+      assert {:ok, _} = RAM.copy("fakepid/path", "/new_path/name")
     end
 
     test "replaces existing path" do
-      assert {:ok, %Encapsulation{id: "fakepid/new_path/name"}} =
-               RAM.copy(%Encapsulation{id: "fakepid/path/to/existing"}, "/new_path/name")
+      assert {:ok, "fakepid/new_path/name"} =
+               RAM.copy("fakepid/path/to/existing", "/new_path/name")
     end
   end
 
   describe "delete/1" do
     setup :build_ram_file
 
-    test "returns success atom", %{encapsulation: encapsulation} do
-      assert :ok = RAM.delete(encapsulation)
+    test "returns success atom", %{id: id} do
+      assert :ok = RAM.delete(id)
     end
   end
 
   describe "read/1" do
     setup :build_ram_file
 
-    test "returns success tuple", %{encapsulation: encapsulation} do
-      assert {:ok, _} = RAM.read(encapsulation)
+    test "returns success tuple", %{id: id} do
+      assert {:ok, _} = RAM.read(id)
     end
 
-    test "returns file contents", %{encapsulation: encapsulation} do
-      assert {_, "some data"} = RAM.read(encapsulation)
+    test "returns file contents", %{id: id} do
+      assert {_, "some data"} = RAM.read(id)
     end
   end
 
@@ -68,6 +68,6 @@ defmodule Capsule.Storages.RAMTest do
       |> :erlang.term_to_binary()
       |> Base.url_encode64()
 
-    %{encapsulation: %Encapsulation{id: Path.join(serialized_pid, "hi")}}
+    %{id: Path.join(serialized_pid, "hi")}
   end
 end

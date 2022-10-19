@@ -12,7 +12,10 @@ defmodule Capsule.Uploads.URI do
         Plug.Conn.resp(conn, 422, "some error")
       end)
 
-      %{result: Capsule.Upload.contents(URI.parse("http://localhost:#{mock_server.port}/file-path"))}
+      %{
+        result:
+          Capsule.Upload.contents(URI.parse("http://localhost:#{mock_server.port}/file-path"))
+      }
     end
 
     test "returns error tuple", %{result: result} do

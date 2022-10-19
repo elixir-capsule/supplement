@@ -1,5 +1,5 @@
 defmodule Capsule.Storages.Disk do
-  alias Capsule.{Storage, Upload, Encapsulation}
+  alias Capsule.{Storage, Upload}
 
   @behaviour Storage
 
@@ -15,38 +15,28 @@ defmodule Capsule.Storages.Disk do
 
       File.write!(destination, contents)
 
-      encapsulation = %Encapsulation{
-        id: path,
-        size: byte_size(contents),
-        storage: to_string(__MODULE__)
-      }
-
-      {:ok, encapsulation}
+      {:ok, path}
     end
     |> case do
-      {:error, error} ->
-        {:error, "Could not store file: #{error}"}
-
-      success_tuple ->
-        success_tuple
+      {:error, error} -> {:error, "Could not store file: #{error}"}
+      success_tuple -> success_tuple
     end
   end
 
-  @impl Storage
-  def copy(%Encapsulation{id: id} = encapsulation, path, opts \\ []) do
+  def copy(id, path, opts \\ []) do
     path_in_root(opts, path)
     |> create_path!
 
     path_in_root(opts, id)
     |> File.cp(path_in_root(opts, path))
     |> case do
-      :ok -> {:ok, encapsulation |> Map.replace!(:id, path)}
+      :ok -> {:ok, path}
       error_tuple -> error_tuple
     end
   end
 
   @impl Storage
-  def delete(%Encapsulation{id: id}, opts \\ []) when is_binary(id) do
+  def delete(id, opts \\ []) when is_binary(id) do
     path_in_root(opts, id)
     |> File.rm()
     |> case do
@@ -56,7 +46,7 @@ defmodule Capsule.Storages.Disk do
   end
 
   @impl Storage
-  def read(%Encapsulation{id: id}, opts \\ []), do: path_in_root(opts, id) |> File.read()
+  def read(id, opts \\ []), do: path_in_root(opts, id) |> File.read()
 
   defp config(opts, key) do
     Application.fetch_env!(:capsule, __MODULE__)
