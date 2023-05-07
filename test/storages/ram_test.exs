@@ -3,15 +3,15 @@ defmodule Capsule.Storages.RAMTest do
   doctest Capsule
 
   alias Capsule.Storages.RAM
-  alias Capsule.{Encapsulation, MockUpload}
+  alias Capsule.{Locator, MockUpload}
 
   describe "put/1" do
     test "returns success tuple" do
-      assert {:ok, %Encapsulation{}} = RAM.put(%MockUpload{})
+      assert {:ok, %Locator{}} = RAM.put(%MockUpload{})
     end
 
     test "prefixes id with pid serialization" do
-      {:ok, %Encapsulation{id: id}} = RAM.put(%MockUpload{})
+      {:ok, %Locator{id: id}} = RAM.put(%MockUpload{})
 
       [serialized_pid, _] = String.split(id, "/")
 
@@ -21,7 +21,7 @@ defmodule Capsule.Storages.RAMTest do
     end
 
     test "suffixes id with name" do
-      {:ok, %Encapsulation{id: id}} = RAM.put(%MockUpload{})
+      {:ok, %Locator{id: id}} = RAM.put(%MockUpload{})
 
       [_, name] = String.split(id, "/")
 
@@ -31,32 +31,32 @@ defmodule Capsule.Storages.RAMTest do
 
   describe "copy/1" do
     test "returns success tuple" do
-      assert {:ok, _} = RAM.copy(%Encapsulation{id: "fakepid/path"}, "/new_path/name")
+      assert {:ok, _} = RAM.copy(%Locator{id: "fakepid/path"}, "/new_path/name")
     end
 
     test "replaces existing path" do
-      assert {:ok, %Encapsulation{id: "fakepid/new_path/name"}} =
-               RAM.copy(%Encapsulation{id: "fakepid/path/to/existing"}, "/new_path/name")
+      assert {:ok, %Locator{id: "fakepid/new_path/name"}} =
+               RAM.copy(%Locator{id: "fakepid/path/to/existing"}, "/new_path/name")
     end
   end
 
   describe "delete/1" do
     setup :build_ram_file
 
-    test "returns success atom", %{encapsulation: encapsulation} do
-      assert :ok = RAM.delete(encapsulation)
+    test "returns success atom", %{locator: locator} do
+      assert :ok = RAM.delete(locator)
     end
   end
 
   describe "read/1" do
     setup :build_ram_file
 
-    test "returns success tuple", %{encapsulation: encapsulation} do
-      assert {:ok, _} = RAM.read(encapsulation)
+    test "returns success tuple", %{locator: locator} do
+      assert {:ok, _} = RAM.read(locator)
     end
 
-    test "returns file contents", %{encapsulation: encapsulation} do
-      assert {_, "some data"} = RAM.read(encapsulation)
+    test "returns file contents", %{locator: locator} do
+      assert {_, "some data"} = RAM.read(locator)
     end
   end
 
@@ -68,6 +68,6 @@ defmodule Capsule.Storages.RAMTest do
       |> :erlang.term_to_binary()
       |> Base.url_encode64()
 
-    %{encapsulation: %Encapsulation{id: Path.join(serialized_pid, "hi")}}
+    %{locator: %Locator{id: Path.join(serialized_pid, "hi")}}
   end
 end

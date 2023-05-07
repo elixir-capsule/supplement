@@ -1,5 +1,5 @@
 defmodule Capsule.Storages.RAM do
-  alias Capsule.{Storage, Upload, Encapsulation}
+  alias Capsule.{Storage, Upload, Locator}
 
   @behaviour Storage
 
@@ -14,25 +14,25 @@ defmodule Capsule.Storages.RAM do
       |> :erlang.term_to_binary()
       |> Base.url_encode64()
 
-    encapsulation = %Encapsulation{
+    locator = %Locator{
       id: Path.join(serialized_pid, Upload.name(upload)),
       storage: to_string(__MODULE__)
     }
 
-    {:ok, encapsulation}
+    {:ok, locator}
   end
 
   @impl Storage
-  def copy(%Encapsulation{id: id} = encapsulation, path, _opts \\ []) do
+  def copy(%Locator{id: id} = locator, path, _opts \\ []) do
     [serialized_pid, _] = decompose_id(id)
 
-    new_encapsulation = %Encapsulation{encapsulation | id: Path.join(serialized_pid, path)}
+    new_locator = %Locator{locator | id: Path.join(serialized_pid, path)}
 
-    {:ok, new_encapsulation}
+    {:ok, new_locator}
   end
 
   @impl Storage
-  def delete(%Encapsulation{id: id}, _opts \\ []) when is_binary(id) do
+  def delete(%Locator{id: id}, _opts \\ []) when is_binary(id) do
     pid = decode_pid!(id)
 
     {:ok, _} = StringIO.close(pid)
@@ -41,7 +41,7 @@ defmodule Capsule.Storages.RAM do
   end
 
   @impl Storage
-  def read(%Encapsulation{id: id}, _opts \\ []),
+  def read(%Locator{id: id}, _opts \\ []),
     do: {:ok, id |> decode_pid! |> StringIO.contents() |> elem(0)}
 
   defp decompose_id(id), do: String.split(id, "/", parts: 2)

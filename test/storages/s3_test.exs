@@ -4,19 +4,19 @@ defmodule Capsule.Storages.S3Test do
   import Mox
 
   alias Capsule.Storages.S3
-  alias Capsule.{Encapsulation, MockUpload, ExAwsMock}
+  alias Capsule.{Locator, MockUpload, ExAwsMock}
 
   describe "put/1" do
     test "returns success tuple" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
-      assert {:ok, %Encapsulation{id: "/hi"}} = S3.put(%MockUpload{})
+      assert {:ok, %Locator{id: "/hi"}} = S3.put(%MockUpload{})
     end
 
     test "sets storage" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
-      assert {:ok, %Encapsulation{storage: "Elixir.Capsule.Storages.S3"}} = S3.put(%MockUpload{})
+      assert {:ok, %Locator{storage: "Elixir.Capsule.Storages.S3"}} = S3.put(%MockUpload{})
     end
 
     test "returns error when request fails" do
@@ -54,7 +54,7 @@ defmodule Capsule.Storages.S3Test do
     test "returns success tuple with data" do
       stub(ExAwsMock, :request, fn _ -> {:ok, %{body: "data"}} end)
 
-      assert {:ok, "data"} = S3.read(%Encapsulation{})
+      assert {:ok, "data"} = S3.read(%Locator{})
     end
   end
 
@@ -62,7 +62,7 @@ defmodule Capsule.Storages.S3Test do
     test "makes request with override value" do
       stub(ExAwsMock, :request, fn %{bucket: "other"} -> {:ok, %{body: ""}} end)
 
-      assert {:ok, _} = S3.read(%Encapsulation{}, bucket: "other")
+      assert {:ok, _} = S3.read(%Locator{}, bucket: "other")
     end
   end
 
@@ -70,8 +70,8 @@ defmodule Capsule.Storages.S3Test do
     test "returns success tuple with data" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
-      assert {:ok, %Encapsulation{id: "new_path"}} =
-               S3.copy(%Encapsulation{id: "/path"}, "new_path")
+      assert {:ok, %Locator{id: "new_path"}} =
+               S3.copy(%Locator{id: "/path"}, "new_path")
     end
   end
 
@@ -79,7 +79,7 @@ defmodule Capsule.Storages.S3Test do
     test "makes request with override value" do
       stub(ExAwsMock, :request, fn %{bucket: "other"} -> {:ok, nil} end)
 
-      assert {:ok, _} = S3.copy(%Encapsulation{}, "new_path", bucket: "other")
+      assert {:ok, _} = S3.copy(%Locator{}, "new_path", bucket: "other")
     end
   end
 end

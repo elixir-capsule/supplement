@@ -1,5 +1,5 @@
 defmodule Capsule.Storages.S3 do
-  alias Capsule.{Storage, Upload, Encapsulation}
+  alias Capsule.{Storage, Upload, Locator}
 
   @behaviour Storage
 
@@ -19,12 +19,12 @@ defmodule Capsule.Storages.S3 do
          )
          |> ex_aws_module().request() do
       {:ok, _} ->
-        encapsulation = %Encapsulation{
+        locator = %Locator{
           id: key,
           storage: to_string(__MODULE__)
         }
 
-        {:ok, encapsulation}
+        {:ok, locator}
 
       error ->
         handle_error(error)
@@ -32,11 +32,11 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def copy(%Encapsulation{id: id} = encapsulation, path, opts \\ []) do
+  def copy(%Locator{id: id} = locator, path, opts \\ []) do
     case Client.put_object_copy(config(opts, :bucket), path, config(opts, :bucket), id)
          |> ex_aws_module().request() do
       {:ok, _} ->
-        {:ok, %{encapsulation | id: path}}
+        {:ok, %{locator | id: path}}
 
       error ->
         handle_error(error)
@@ -44,7 +44,7 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def delete(%Encapsulation{id: id}, opts \\ []) do
+  def delete(%Locator{id: id}, opts \\ []) do
     case Client.delete_object(config(opts, :bucket), id)
          |> ex_aws_module().request() do
       {:ok, _} -> :ok
@@ -53,7 +53,7 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def read(%Encapsulation{id: id}, opts \\ []) do
+  def read(%Locator{id: id}, opts \\ []) do
     case Client.get_object(config(opts, :bucket), id) |> ex_aws_module().request() do
       {:ok, %{body: contents}} -> {:ok, contents}
       error -> handle_error(error)
