@@ -12,6 +12,12 @@ defmodule Capsule.Storages.DiskTest do
       on_exit(fn -> File.rm!("tmp/hi") end)
     end
 
+    test "sets size" do
+      assert {:ok, %Encapsulation{size: 14}} = Disk.put(%MockUpload{})
+
+      on_exit(fn -> File.rm!("tmp/hi") end)
+    end
+
     test "sets storage" do
       assert {:ok, %Encapsulation{storage: "Elixir.Capsule.Storages.Disk"}} =
                Disk.put(%MockUpload{})

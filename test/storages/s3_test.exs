@@ -13,6 +13,12 @@ defmodule Capsule.Storages.S3Test do
       assert {:ok, %Encapsulation{id: "/hi"}} = S3.put(%MockUpload{})
     end
 
+    test "sets size" do
+      stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
+
+      assert {:ok, %Encapsulation{size: 14}} = S3.put(%MockUpload{})
+    end
+
     test "sets storage" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
