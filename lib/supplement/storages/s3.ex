@@ -15,7 +15,7 @@ defmodule Capsule.Storages.S3 do
     end
   end
 
-  def copy(source_id, dest_path, opts \\ []) do
+  def clone(source_id, dest_path, opts \\ []) do
     opts = config(opts)
     default_bucket = Keyword.get(opts, :bucket)
 
@@ -41,6 +41,12 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
+  def stream(id, opts \\ []) do
+    Client.download_file(config(opts, :bucket), id, :memory)
+    |> ex_aws_module().stream!()
+  end
+
+  @impl Storage
   def read(id, opts \\ []) do
     case Client.get_object(config(opts, :bucket), id) |> ex_aws_module().request(opts) do
       {:ok, %{body: contents}} -> {:ok, contents}
@@ -59,8 +65,8 @@ defmodule Capsule.Storages.S3 do
   end
 
   @impl Storage
-  def path(path, opts \\ []), do: nil
-
+  def path(_path, _opts \\ []), do: nil
+  
 
   defp do_put(:contents, upload, key, opts) do
     with {:ok, contents} <- Upload.contents(upload) do
@@ -74,7 +80,7 @@ defmodule Capsule.Storages.S3 do
     end
   end
   defp do_put(_stream, upload, key, opts) do
-    with {:ok, path} <- Upload.path(upload) do
+    with path when is_binary(path) <- Upload.path(upload) do
       path
       |> Client.Upload.stream_file()
       |> Client.upload(

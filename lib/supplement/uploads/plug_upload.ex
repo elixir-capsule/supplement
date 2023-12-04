@@ -2,8 +2,8 @@ defimpl Capsule.Upload, for: Plug.Upload do
 
   def path(%{path: path}) when is_binary(path) do
     case File.exists?(path) do
-      {:error, reason} -> {:error, "Source file does not exist"}
-      success_tuple -> {:ok, path}
+      false -> nil
+      true -> path
     end
   end
   

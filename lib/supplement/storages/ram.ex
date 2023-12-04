@@ -17,10 +17,10 @@ defmodule Capsule.Storages.RAM do
     {:ok, Path.join(serialized_pid, Upload.name(upload))}
   end
 
-  def copy(id, path, _opts \\ []) do
+  def clone(id, dest_path, _opts \\ []) do
     [serialized_pid, _] = decompose_id(id)
 
-    {:ok, Path.join(serialized_pid, path)}
+    {:ok, Path.join(serialized_pid, dest_path)}
   end
 
   @impl Storage
@@ -33,14 +33,18 @@ defmodule Capsule.Storages.RAM do
   end
 
   @impl Storage
+  def stream(id, _opts \\ []),
+    do: {:ok, id |> decode_pid! |> IO.binstream(512)}
+
+  @impl Storage
   def read(id, _opts \\ []),
     do: {:ok, id |> decode_pid! |> StringIO.contents() |> elem(0)}
 
   @impl Storage
-  def url(path, opts \\ []), do: nil
+  def url(_path, _opts \\ []), do: nil
 
   @impl Storage
-  def path(path, opts \\ []), do: nil
+  def path(_path, _opts \\ []), do: nil
 
   defp decompose_id(id), do: String.split(id, "/", parts: 2)
 

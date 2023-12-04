@@ -5,11 +5,11 @@ defmodule Capsule.Storages.Disk do
 
   @impl Storage
   def put(upload, opts \\ []) do
-    with path <- Path.join(opts[:prefix] || "/", Upload.name(upload)),
+    with path <- Path.join(opts[:prefix] || "/", opts[:name] || Upload.name(upload)),
          destination <- path(path, opts),
          true <-
-           !File.exists?(destination) || opts[:force] ||
-             {:error, "File already exists at upload destination"},
+           !File.exists?(destination) || opts[:force] || if(opts[:skip_existing], do: {:ok, destination}) ||
+             {:error, "File already exists at #{destination}"},
          :ok <- do_put(opts[:upload_with], upload, destination) do
 
       {:ok, path}
@@ -21,6 +21,13 @@ defmodule Capsule.Storages.Disk do
     end
   end
 
+  defp do_put(_stream, %struct{} = upload, destination) when struct in [File.Stream, Stream, IO.Stream] do
+    create_path!(destination)
+
+    upload
+    |> Stream.into(File.stream!(destination))
+    |> Stream.run()
+  end
   defp do_put(:contents, upload, destination) do
     with {:ok, contents} <- Upload.contents(upload) do
       create_path!(destination)
@@ -29,7 +36,10 @@ defmodule Capsule.Storages.Disk do
     end
   end
   defp do_put(_path, upload, destination) do
-    with {:ok, path} <- Upload.path(upload) do
+    path = Upload.path(upload)
+
+    with true <- is_binary(path) and File.exists?(path) do
+
       create_path!(destination)
 
       if path == destination do
@@ -40,19 +50,20 @@ defmodule Capsule.Storages.Disk do
         end
       end
 
-    else nil ->
+    else 
+      _false ->
       do_put(:contents, upload, destination)
     end
   end
 
-  def copy(id, path, opts \\ []) do
-    path(path, opts)
+  def clone(id, dest_path, opts \\ []) do
+    path(dest_path, opts)
     |> create_path!
 
     path(id, opts)
-    |> File.cp(path(path, opts))
+    |> File.cp(path(dest_path, opts))
     |> case do
-      :ok -> {:ok, path}
+      :ok -> {:ok, dest_path}
       error_tuple -> error_tuple
     end
   end
@@ -68,20 +79,42 @@ defmodule Capsule.Storages.Disk do
   end
 
   @impl Storage
+  def stream(path, opts \\ []) do 
+    path = path(path, opts)
+    if File.exists?(path), do: File.stream!(path, [], 512)
+  end
+
+  @impl Storage
   def read(path, opts \\ []), do: path(path, opts) |> File.read()
 
   @impl Storage
   def url(path, opts \\ []), do: Path.join("/", path(path, opts))
 
   @impl Storage
-  def path(path, opts \\ []), do: config(opts, :root_dir)
-    |> Path.join(path)
+  def path(path, opts \\ [])  
+  def path(path, opts) when is_binary(path) do 
+    opts = config(opts)
+    root_dir = Keyword.get(opts, :root_dir)
 
-  defp config(opts, key) do
-    Application.fetch_env!(:capsule, __MODULE__)
-    |> Keyword.merge(opts)
-    |> Keyword.fetch!(key)
+    if is_nil(root_dir) or String.starts_with?(path, Path.join("/", root_dir)) do
+      String.trim(path, "/")
+    else
+      Path.join(root_dir, path)
+    end
   end
+  def path(%{} = upload, opts) do 
+    Upload.name(upload)
+    |> path(opts)
+  end
+
+  defp config(opts) do
+    Application.get_env(:capsule, __MODULE__, [])
+    |> Keyword.merge(opts)
+  end
+  # defp config(opts, key) do
+  #   config(opts)
+  #   |> Keyword.fetch!(key)
+  # end
 
   defp create_path!(path) do
     path |> Path.dirname() |> File.mkdir_p!()
