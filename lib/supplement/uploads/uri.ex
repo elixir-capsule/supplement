@@ -19,5 +19,9 @@ defimpl Capsule.Upload, for: URI do
     end
   end
 
+  def path(_) do
+    nil
+  end
+
   def name(%{path: path}), do: Path.basename(path)
 end

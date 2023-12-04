@@ -37,13 +37,15 @@ defmodule Capsule.Storages.DiskTest do
     end
 
     test "overwrites existing file when force is set to true" do
-      File.write!("tmp/name", "data")
+      file = "tmp/name"
 
-      Disk.put(%MockUpload{name: "name", content: "new"}, force: true)
+      File.write!(file, "data")
 
-      assert "new" = File.read!("tmp/name")
+      Disk.put(%MockUpload{name: "name", content: "new", path: file}, force: true)
 
-      on_exit(fn -> File.rm!("tmp/name") end)
+      assert "new" = File.read!(file)
+
+      on_exit(fn -> File.rm!(file) end)
     end
   end
 

@@ -6,29 +6,51 @@ defmodule Capsule.Storages.Disk do
   @impl Storage
   def put(upload, opts \\ []) do
     with path <- Path.join(opts[:prefix] || "/", Upload.name(upload)),
-         destination <- path_in_root(opts, path),
+         destination <- path(path, opts),
          true <-
            !File.exists?(destination) || opts[:force] ||
              {:error, "File already exists at upload destination"},
-         {:ok, contents} <- Upload.contents(upload) do
-      create_path!(destination)
-
-      File.write!(destination, contents)
+         :ok <- do_put(opts[:upload_with], upload, destination) do
 
       {:ok, path}
     end
     |> case do
+      {:ok, path} -> {:ok, path}
       {:error, error} -> {:error, "Could not store file: #{error}"}
-      success_tuple -> success_tuple
+      other -> {:error, "Could not store file: #{inspect other}"}
+    end
+  end
+
+  defp do_put(:contents, upload, destination) do
+    with {:ok, contents} <- Upload.contents(upload) do
+      create_path!(destination)
+
+      File.write(destination, contents)
+    end
+  end
+  defp do_put(_path, upload, destination) do
+    with {:ok, path} <- Upload.path(upload) do
+      create_path!(destination)
+
+      if path == destination do
+        do_put(:contents, upload, destination)
+      else
+        with {:ok, _} <- File.copy(path, destination) do
+          :ok
+        end
+      end
+
+    else nil ->
+      do_put(:contents, upload, destination)
     end
   end
 
   def copy(id, path, opts \\ []) do
-    path_in_root(opts, path)
+    path(path, opts)
     |> create_path!
 
-    path_in_root(opts, id)
-    |> File.cp(path_in_root(opts, path))
+    path(id, opts)
+    |> File.cp(path(path, opts))
     |> case do
       :ok -> {:ok, path}
       error_tuple -> error_tuple
@@ -37,7 +59,7 @@ defmodule Capsule.Storages.Disk do
 
   @impl Storage
   def delete(id, opts \\ []) when is_binary(id) do
-    path_in_root(opts, id)
+    path(id, opts)
     |> File.rm()
     |> case do
       :ok -> :ok
@@ -46,17 +68,19 @@ defmodule Capsule.Storages.Disk do
   end
 
   @impl Storage
-  def read(id, opts \\ []), do: path_in_root(opts, id) |> File.read()
+  def read(path, opts \\ []), do: path(path, opts) |> File.read()
+
+  @impl Storage
+  def url(path, opts \\ []), do: Path.join("/", path(path, opts))
+
+  @impl Storage
+  def path(path, opts \\ []), do: config(opts, :root_dir)
+    |> Path.join(path)
 
   defp config(opts, key) do
     Application.fetch_env!(:capsule, __MODULE__)
     |> Keyword.merge(opts)
     |> Keyword.fetch!(key)
-  end
-
-  defp path_in_root(opts, path) do
-    config(opts, :root_dir)
-    |> Path.join(path)
   end
 
   defp create_path!(path) do

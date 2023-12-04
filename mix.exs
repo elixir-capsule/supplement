@@ -31,6 +31,7 @@ defmodule Supplement.MixProject do
   defp deps do
     [
       {:capsule, "~> 0.9"},
+      # {:capsule, path: "../capsule"},
       {:ex_aws, "~> 2.0", optional: true},
       {:ex_aws_s3, "~> 2.0", optional: true},
       {:mox, "~> 1.0", only: [:test]},
