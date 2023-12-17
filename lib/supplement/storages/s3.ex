@@ -23,14 +23,6 @@ defmodule Capsule.Storages.S3 do
     end
   end
 
-  def copy(id, path, opts \\ []) do
-    case Client.put_object_copy(config(opts, :bucket), path, config(opts, :bucket), id)
-         |> ex_aws_module().request() do
-      {:ok, _} -> {:ok, path}
-      error -> handle_error(error)
-    end
-  end
-
   @impl Storage
   def delete(id, opts \\ []) do
     case Client.delete_object(config(opts, :bucket), id)

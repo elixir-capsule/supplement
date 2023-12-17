@@ -29,17 +29,6 @@ defmodule Capsule.Storages.RAMTest do
     end
   end
 
-  describe "copy/1" do
-    test "returns success tuple" do
-      assert {:ok, _} = RAM.copy("fakepid/path", "/new_path/name")
-    end
-
-    test "replaces existing path" do
-      assert {:ok, "fakepid/new_path/name"} =
-               RAM.copy("fakepid/path/to/existing", "/new_path/name")
-    end
-  end
-
   describe "delete/1" do
     setup :build_ram_file
 

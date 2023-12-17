@@ -59,20 +59,4 @@ defmodule Capsule.Storages.S3Test do
       assert {:ok, _} = S3.read("fake", bucket: "other")
     end
   end
-
-  describe "copy/1" do
-    test "returns success tuple" do
-      stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
-
-      assert {:ok, "new_path"} = S3.copy("/path", "new_path")
-    end
-  end
-
-  describe "copy/2 with bucket override" do
-    test "makes request with override value" do
-      stub(ExAwsMock, :request, fn %{bucket: "other"} -> {:ok, nil} end)
-
-      assert {:ok, _} = S3.copy("fake", "new_path", bucket: "other")
-    end
-  end
 end

@@ -56,22 +56,4 @@ defmodule Capsule.Storages.DiskTest do
       on_exit(fn -> File.rm!("tmp/path") end)
     end
   end
-
-  describe "copy/1" do
-    test "returns success tuple with data" do
-      File.write!("tmp/path", "data")
-
-      assert {:ok, "new_path"} = Disk.copy("/path", "new_path")
-
-      on_exit(fn -> File.rm!("tmp/new_path") end)
-    end
-
-    test "creates path" do
-      File.write!("tmp/path", "data")
-
-      assert {:ok, "subdir/new_path"} = Disk.copy("path", "subdir/new_path")
-
-      on_exit(fn -> File.rm!("tmp/subdir/new_path") end)
-    end
-  end
 end

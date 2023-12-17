@@ -23,18 +23,6 @@ defmodule Capsule.Storages.Disk do
     end
   end
 
-  def copy(id, path, opts \\ []) do
-    path_in_root(opts, path)
-    |> create_path!
-
-    path_in_root(opts, id)
-    |> File.cp(path_in_root(opts, path))
-    |> case do
-      :ok -> {:ok, path}
-      error_tuple -> error_tuple
-    end
-  end
-
   @impl Storage
   def delete(id, opts \\ []) when is_binary(id) do
     path_in_root(opts, id)

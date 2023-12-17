@@ -17,12 +17,6 @@ defmodule Capsule.Storages.RAM do
     {:ok, Path.join(serialized_pid, Upload.name(upload))}
   end
 
-  def copy(id, path, _opts \\ []) do
-    [serialized_pid, _] = decompose_id(id)
-
-    {:ok, Path.join(serialized_pid, path)}
-  end
-
   @impl Storage
   def delete(id, _opts \\ []) when is_binary(id) do
     pid = decode_pid!(id)
