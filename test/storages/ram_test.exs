@@ -49,6 +49,14 @@ defmodule Capsule.Storages.RAMTest do
     end
   end
 
+  describe "stream/1" do
+    setup :build_ram_file
+
+    test "result can be enumerated", %{id: id} do
+      assert ["some data"] = id |> RAM.stream!() |> Enum.to_list()
+    end
+  end
+
   defp build_ram_file(_context) do
     {:ok, pid} = StringIO.open("some data")
 

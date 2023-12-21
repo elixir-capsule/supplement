@@ -56,4 +56,14 @@ defmodule Capsule.Storages.DiskTest do
       on_exit(fn -> File.rm!("tmp/path") end)
     end
   end
+
+  describe "stream!/1" do
+    test "returns enum of file contents" do
+      File.write!("tmp/path", "data")
+
+      assert "data" = "path" |> Disk.stream!() |> Enum.join()
+
+      on_exit(fn -> File.rm!("tmp/path") end)
+    end
+  end
 end

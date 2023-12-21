@@ -38,11 +38,18 @@ jobs:
   dialyzer:
     runs-on: ubuntu-latest
 
-    container:
-      image: bitwalker/alpine-elixir:1.10.4
+    strategy:
+      matrix:
+        elixir: ["1.13.x"]
+        otp: ["24.x"]
 
     steps:
       - uses: actions/checkout@v1
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
       - uses: actions/cache@v2
         with:
           path: _build

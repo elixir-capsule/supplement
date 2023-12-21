@@ -59,4 +59,16 @@ defmodule Capsule.Storages.S3Test do
       assert {:ok, _} = S3.read("fake", bucket: "other")
     end
   end
+
+  describe "stream!/1" do
+    test "returns ex aws stream" do
+      stub(ExAwsMock, :stream!, fn _ ->
+        Stream.transform([0, 1], 0, fn i, acc ->
+          if acc < 3, do: {[i], acc + 1}, else: {:halt, acc}
+        end)
+      end)
+
+      assert [0, 1] = "fake" |> S3.stream!() |> Enum.to_list()
+    end
+  end
 end

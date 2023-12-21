@@ -4,6 +4,14 @@ defmodule Capsule.Storages.Disk do
   @behaviour Storage
 
   @impl Storage
+
+  def stream!(id, opts \\ []) do
+    opts
+    |> path_in_root(id)
+    |> File.stream!()
+  end
+
+  @impl Storage
   def put(upload, opts \\ []) do
     with path <- Path.join(opts[:prefix] || "/", Upload.name(upload)),
          destination <- path_in_root(opts, path),

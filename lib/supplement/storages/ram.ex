@@ -30,6 +30,13 @@ defmodule Capsule.Storages.RAM do
   def read(id, _opts \\ []),
     do: {:ok, id |> decode_pid! |> StringIO.contents() |> elem(0)}
 
+  @impl Storage
+  def stream!(id, _opts \\ []) do
+    id
+    |> decode_pid!
+    |> IO.stream(:line)
+  end
+
   defp decompose_id(id), do: String.split(id, "/", parts: 2)
 
   defp decode_pid!(id) do

@@ -40,6 +40,14 @@ defmodule Capsule.Storages.S3 do
     end
   end
 
+  @impl Storage
+  def stream!(id, opts \\ []) do
+    opts
+    |> config(:bucket)
+    |> Client.download_file(id, :memory)
+    |> ex_aws_module().stream!()
+  end
+
   defp config(opts, key) do
     Application.fetch_env!(:capsule, __MODULE__)
     |> Keyword.merge(opts)
