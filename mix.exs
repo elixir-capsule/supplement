@@ -43,7 +43,8 @@ defmodule Supplement.MixProject do
   defp dialyzer do
     [
       plt_core_path: "priv/plts",
-      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+      plt_add_apps: [:ex_aws_s3]
     ]
   end
 
