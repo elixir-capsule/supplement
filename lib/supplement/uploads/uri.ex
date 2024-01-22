@@ -8,10 +8,10 @@ defimpl Capsule.Upload, for: URI do
       end)
 
     case download |> Task.await(15_000) do
-      {:ok, {{'HTTP/1.1', 200, 'OK'}, _headers, body}} ->
+      {:ok, {{~c"HTTP/1.1", 200, ~c"OK"}, _headers, body}} ->
         {:ok, body}
 
-      {:ok, {{'HTTP/1.1', code, _}, _headers, _}} ->
+      {:ok, {{~c"HTTP/1.1", code, _}, _headers, _}} ->
         {:error, "Unsuccessful response code: #{code}"}
 
       {:error, {reason, _}} ->

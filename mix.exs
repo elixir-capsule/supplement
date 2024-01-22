@@ -20,7 +20,7 @@ defmodule Supplement.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :ex_aws, :ex_aws_s3]
+      extra_applications: [:logger]
     ]
   end
 
