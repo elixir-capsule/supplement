@@ -8,7 +8,7 @@ Supplement is not currently published to [hex.pm](https://hex.pm), so you will n
 
 *Note: to avoid unintentional upgrades when using a repo, consider locking it to a specific `:ref`*
 
-Supplement's only _required_ dependency is `Capsule` itself. However, some of the implementations might require further dependencies that you will also need to add to your project's deps. 
+Supplement's only _required_ dependency is `Capsule` itself. However, some of the implementations might require further dependencies (currently only [S3](#s3)) that you will also need to add to your project's deps. 
 Consult the relevent `dependencies` section below.
 
 ## Storages
