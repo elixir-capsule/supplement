@@ -8,7 +8,7 @@ defmodule Capsule.Storages.Disk do
   def stream!(id, opts \\ []) do
     opts
     |> path_in_root(id)
-    |> File.stream!()
+    |> File.stream!(Keyword.get(opts, :stream_opts, []))
   end
 
   @impl Storage
