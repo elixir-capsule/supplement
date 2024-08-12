@@ -7,7 +7,7 @@ defmodule Capsule.Storages.S3 do
 
   @impl Storage
   def put(upload, opts \\ []) do
-    key = Path.join(opts[:prefix] || "/", Upload.name(upload))
+    key = opts[:key] || Upload.name(upload)
 
     {:ok, contents} = Upload.contents(upload)
 

@@ -8,7 +8,7 @@ Supplement is not currently published to [hex.pm](https://hex.pm), so you will n
 
 *Note: to avoid unintentional upgrades when using a repo, consider locking it to a specific `:ref`*
 
-Supplement's only _required_ dependency is `Capsule` itself. However, some of the implementations might require further dependencies (currently only [S3](#s3)) that you will also need to add to your project's deps. 
+Supplement's only _required_ dependency is `Capsule` itself. However, some of the implementations might require further dependencies (currently only [S3](#s3)) that you will also need to add to your project's deps.
 Consult the relevent `dependencies` section below.
 
 ## Storages
@@ -46,7 +46,7 @@ This storage uploads files to [AWS's S3](https://aws.amazon.com/s3/) service. It
 
 #### options
 
-- prefix: A string to prepend to the upload's key
+- key: Path to store upload in bucket
 - s3_options: Keyword list of option that will passed directly to ex_aws_s3
 
 #### dependencies

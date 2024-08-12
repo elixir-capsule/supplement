@@ -10,7 +10,7 @@ defmodule Capsule.Storages.S3Test do
     test "returns success tuple" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)
 
-      assert {:ok, "/hi"} = S3.put(%MockUpload{})
+      assert {:ok, "hi"} = S3.put(%MockUpload{})
     end
 
     test "returns error when request fails" do
