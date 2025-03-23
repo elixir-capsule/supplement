@@ -6,6 +6,27 @@ defmodule Capsule.Storages.S3Test do
   alias Capsule.Storages.S3
   alias Capsule.{MockUpload, ExAwsMock}
 
+  describe "stat/1" do
+    test "returns success tuple with map of metadata" do
+      fake_headers = [
+        {"Content-Type", "text/plain"},
+        {"Content-Length", "123"},
+        {"Last-Modified", "2022-01-01T00:00:00Z"},
+        {"Date", "2022-01-01T00:00:00Z"}
+      ]
+
+      stub(ExAwsMock, :request, fn _ -> {:ok, %{headers: fake_headers}} end)
+
+      assert {:ok, %{}} = S3.stat(%MockUpload{})
+    end
+
+    test "returns error tuple with not_found key when status is 404" do
+      stub(ExAwsMock, :request, fn _ -> {:error, %{status_code: 404}} end)
+
+      assert {:error, :not_found} = S3.stat(%MockUpload{})
+    end
+  end
+
   describe "put/1" do
     test "returns success tuple" do
       stub(ExAwsMock, :request, fn _ -> {:ok, nil} end)

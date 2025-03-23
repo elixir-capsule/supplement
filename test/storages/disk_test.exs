@@ -5,6 +5,20 @@ defmodule Capsule.Storages.DiskTest do
   alias Capsule.Storages.Disk
   alias Capsule.MockUpload
 
+  describe "stat/1" do
+    test "returns success tuple with map of metadata" do
+      File.write!("tmp/path", "data")
+
+      assert {:ok, %{}} = Disk.stat("path")
+
+      on_exit(fn -> File.rm!("tmp/path") end)
+    end
+
+    test "returns error tuple with not_found key when no file exists" do
+      assert {:error, :not_found} = Disk.stat("path")
+    end
+  end
+
   describe "put/1" do
     test "returns success tuple" do
       assert {:ok, _} = Disk.put(%MockUpload{})

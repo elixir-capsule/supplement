@@ -4,6 +4,12 @@ defmodule Capsule.Storages.RAM do
   @behaviour Storage
 
   @impl Storage
+  def stat(id, opts \\ []) do
+    {:ok, contents} = read(id, opts)
+    {:ok, %{size: byte_size(contents)}}
+  end
+
+  @impl Storage
   def put(upload, _opts \\ []) do
     {:ok, contents} = Upload.contents(upload)
 

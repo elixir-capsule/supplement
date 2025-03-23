@@ -12,6 +12,23 @@ defmodule Capsule.Storages.Disk do
   end
 
   @impl Storage
+  def stat(id, opts \\ []) do
+    opts
+    |> path_in_root(id)
+    |> File.stat()
+    |> case do
+      {:ok, %{size: size, type: mime_type, ctime: created_at, mtime: updated_at}} ->
+        {:ok, %{size: size, mime_type: mime_type, created_at: created_at, updated_at: updated_at}}
+
+      {:error, :enoent} ->
+        {:error, :not_found}
+
+      {:error, error} ->
+        {:error, "Could not get file stats: #{inspect(error)}"}
+    end
+  end
+
+  @impl Storage
   def put(upload, opts \\ []) do
     with path <- Path.join(opts[:prefix] || "/", Upload.name(upload)),
          destination <- path_in_root(opts, path),

@@ -30,7 +30,7 @@ defmodule Supplement.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:capsule, github: "elixir-capsule/capsule"},
+      {:capsule, github: "elixir-capsule/capsule", branch: "stat"},
       {:ex_aws, "~> 2.0", optional: true},
       {:ex_aws_s3, "~> 2.0", optional: true},
       {:mox, "~> 1.0", only: [:test]},

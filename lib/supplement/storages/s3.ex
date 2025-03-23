@@ -6,6 +6,29 @@ defmodule Capsule.Storages.S3 do
   alias ExAws.S3, as: Client
 
   @impl Storage
+  def stat(id, opts \\ []) do
+    case Client.head_object(config(opts, :bucket), id)
+         |> ex_aws_module().request() do
+      {:error, %{status_code: 404}} ->
+        {:error, :not_found}
+
+      {:ok, %{headers: headers}} ->
+        headers = Map.new(headers)
+
+        {:ok,
+         %{
+           size: Map.fetch!(headers, "Content-Length"),
+           updated_at: Map.fetch!(headers, "Last-Modified"),
+           created_at: Map.fetch!(headers, "Date"),
+           mime_type: Map.fetch!(headers, "Content-Type")
+         }}
+
+      error ->
+        handle_error(error)
+    end
+  end
+
+  @impl Storage
   def put(upload, opts \\ []) do
     key = opts[:key] || Upload.name(upload)
 
