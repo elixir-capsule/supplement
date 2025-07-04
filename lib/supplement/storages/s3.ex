@@ -9,16 +9,18 @@ defmodule Capsule.Storages.S3 do
   def put(upload, opts \\ []) do
     key = opts[:key] || Upload.name(upload)
 
-    {:ok, contents} = Upload.contents(upload)
-
-    case Client.put_object(
-           config(opts, :bucket),
-           key,
-           contents,
-           Keyword.get(opts, :s3_options, [])
-         )
-         |> ex_aws_module().request() do
-      {:ok, _} -> {:ok, key}
+    with {:ok, contents} <- Upload.contents(upload),
+         {:ok, _} <-
+           opts
+           |> config(:bucket)
+           |> Client.put_object(
+             key,
+             contents,
+             Keyword.get(opts, :s3_options, [])
+           )
+           |> ex_aws_module().request() do
+      {:ok, key}
+    else
       error -> handle_error(error)
     end
   end

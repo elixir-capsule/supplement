@@ -18,6 +18,10 @@ defmodule Capsule.Storages.S3Test do
 
       assert {:error, _} = S3.put(%MockUpload{})
     end
+
+    test "returns error when upload can't be read" do
+      assert {:error, _} = S3.put(%MockUpload{content: "error"})
+    end
   end
 
   describe "put/2 with bucket override" do
