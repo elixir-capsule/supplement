@@ -14,8 +14,8 @@ defimpl Capsule.Upload, for: URI do
       {:ok, {{~c"HTTP/1.1", code, _}, _headers, _}} ->
         {:error, "Unsuccessful response code: #{code}"}
 
-      {:error, {reason, _}} ->
-        {:error, reason}
+      {:error, reason} ->
+        {:error, inspect(reason)}
     end
   end
 
