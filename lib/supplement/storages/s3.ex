@@ -38,7 +38,7 @@ defmodule Capsule.Storages.S3 do
   def read(id, opts \\ []) do
     case Client.get_object(config(opts, :bucket), id) |> ex_aws_module().request() do
       {:ok, %{body: contents}} -> {:ok, contents}
-      {:http_error, 404, _} -> {:error, :not_found}
+      {:error, {:http_error, 404, _}} -> {:error, :not_found}
       error -> handle_error(error)
     end
   end
