@@ -47,7 +47,7 @@ defmodule Capsule.Storages.S3 do
   def stream!(id, opts \\ []) do
     opts
     |> config(:bucket)
-    |> Client.download_file(id, :memory)
+    |> Client.download_file(id, :memory, opts)
     |> ex_aws_module().stream!()
   end
 
