@@ -75,4 +75,13 @@ defmodule Capsule.Storages.S3Test do
       assert [0, 1] = "fake" |> S3.stream!() |> Enum.to_list()
     end
   end
+
+  describe "stream!/2 with options" do
+    test "forwards them to the download operation" do
+      stub(ExAwsMock, :stream!, fn %{opts: opts} -> [opts] end)
+
+      assert [[chunk_size: 1, max_concurrency: 1]] =
+               "fake" |> S3.stream!(chunk_size: 1, max_concurrency: 1) |> Enum.to_list()
+    end
+  end
 end
